@@ -1,5 +1,5 @@
 class ApiWorkshop
   def call(env)
-    [200, {}, 'ok']
+    [200, {}, ['ok']]
   end
 end

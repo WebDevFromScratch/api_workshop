@@ -4,7 +4,8 @@ require 'rack/test'
 describe ApiWorkshop do
   include Rack::Test::Methods
 
-  let(:app) { ApiWorkshop.new }
+  let(:api_app) { ApiWorkshop.new }
+  let(:app) { Rack::Lint.new(api_app) }
   before { get '/' }
 
   it 'response should be okay' do
