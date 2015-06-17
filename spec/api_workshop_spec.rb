@@ -50,7 +50,7 @@ describe ApiWorkshop do
 
         context 'with invalid data' do
           it 'returns 422 status and an expected error' do
-            post '/api/stories', {url: '', title: ''}.to_json 'CONTENT_TYPE' => 'application/json'
+            post '/api/stories', {url: '', title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(response.status).to eq(422)
             expect(response.body).to eq('URL and/or title is missing.')
@@ -58,7 +58,7 @@ describe ApiWorkshop do
         end
 
         context 'when a story url already exists in the database' do
-          before do { post '/api/stories', {url: 'existing story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+          before { post '/api/stories', {url: 'existing story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
           it 'returns 409 status and an expected error' do
             post '/api/stories', {url: 'existing story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
