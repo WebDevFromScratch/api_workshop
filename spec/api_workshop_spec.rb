@@ -9,10 +9,11 @@ describe ApiWorkshop do
   let(:app) { Rack::Lint.new(api_app) }
 
   describe 'api' do
-    # before do
-    #   @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
-    #   @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
-    # end
+    before do
+      @story = Story.create!(id: 1, title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
+      # @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
+      # @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
+    end
 
     describe '/stories' do
       describe 'GET /' do
