@@ -157,10 +157,10 @@ describe ApiWorkshop do
     describe '/users' do
       describe 'POST /' do
         context 'with valid data' do
-          it 'returns 200 status' do
+          it 'returns 201 status' do
             post '/api/users', {username: 'JohnDoe', password: 'secret123'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-            expect(response.status).to eq(200)
+            expect(response.status).to eq(201)
             # expect(response.body).to eq()
           end
         end
