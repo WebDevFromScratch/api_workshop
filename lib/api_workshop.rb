@@ -19,4 +19,13 @@ class ApiWorkshop < Sinatra::Base
       ]
     }.to_json
   end
+
+  get '/api/stories/1' do
+    content_type :json
+    {
+      id: 1,
+      url: 'http://story1.com',
+      title: 'Story 1'
+    }.to_json
+  end
 end

@@ -26,12 +26,15 @@ describe ApiWorkshop do
 
       describe 'GET /:id' do
         context 'a story exists' do
-          xit 'returns 200 status response and a story details' do
-            get "/api/stories/#{@story1.id}"
+          it 'returns 200 status response and a story details' do
+            # get "/api/stories/#{@story1.id}"
+            get '/api/stories/1'
 
             expect(last_response.status).to eq(200)
-            expect(json['url']).to eq(@story1.url)
-            expect(json['title']).to eq(@story1.title)
+            # expect(json['url']).to eq(@story1.url)
+            # expect(json['title']).to eq(@story1.title)
+            expect(json['url']).to eq('http://story1.com')
+            expect(json['title']).to eq('Story 1')
           end
         end
 
