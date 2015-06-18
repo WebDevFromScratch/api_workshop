@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'rack/test'
 require 'json'
+require 'pry'
 
 describe App do
   include Rack::Test::Methods
@@ -18,6 +19,8 @@ describe App do
       describe 'GET /' do
         it 'returns 200 status response and a list of stories' do
           get '/api/stories'
+
+          binding.pry
 
           expect(last_response.status).to eq(200)
           expect(json['stories'].length).to eq(2)
@@ -51,6 +54,7 @@ describe App do
             post '/api/stories', {url: 'story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(201)
+            # expect(last_response.header['Location']).to eq('')
             expect(json['url']).to eq('story url')
             expect(json['title']).to eq('story title')
           end
@@ -168,6 +172,7 @@ describe App do
             post '/api/users', {username: 'JohnDoe', password: 'secret123'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(201)
+            # expect(last_response.header['Location']).to eq('')
             expect(json['username']).to eq('JohnDoe')
             expect(json['password']).to eq('secret123')
           end
