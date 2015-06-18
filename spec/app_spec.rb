@@ -98,47 +98,70 @@ describe App do
         end
       end
 
-      describe 'POST /:id/vote/up' do
-        context 'when a user has not upvote yet' do
-          xit 'returns 200 status' do
-            post "/api/stories/#{@story1.id}/vote/up"
+      describe 'PUT /:id/vote' do
+        context 'when a user votes up' do
+          context 'when a user has not voted yet' do
+            xit 'returns 200 status' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-            expect(last_response.status).to eq(200)
-            expect(json['vote']).to eq('up')
-            # should also return something like user_id, story_id??
+              expect(last_response.status).to eq(200)
+              expect(json['vote']).to eq('up')
+            end
+          end
+
+          context 'when a user has already voted down' do
+            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+            xit 'returns 200 status' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+              expect(last_response.status).to eq(200)
+              expect(json['vote']).to eq('up')
+            end
+          end
+
+          context 'when a user has already voted up' do
+            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+            xit 'returns 409 status and an expected error' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+              expect(last_response.status).to eq(409)
+              expect(json['error']).to eq('You have already upvoted this story.')
+            end
           end
         end
 
-        context 'when a user has already casted an upvote' do
-          before { post "/api/stories/#{@story1.id}/vote/up" }
+        context 'when a user votes down' do
+          context 'when a user has not voted yet' do
+            xit 'returns 200 status' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-          xit 'returns 409 status and an expected error' do
-            post "/api/stories/#{@story1.id}/vote/up"
-
-            expect(last_response.status).to eq(409)
-            expect(json['error']).to eq('You have already upvoted this story.')
+              expect(last_response.status).to eq(200)
+              expect(json['vote']).to eq('down')
+            end
           end
-        end
-      end
 
-      describe 'POST /:id/vote/down' do
-        context 'when a user has not upvote yet' do
-          xit 'returns 200 status' do
-            post "/api/stories/#{@story1.id}/vote/down"
+          context 'when a user has already voted up' do
+            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
-            expect(last_response.status).to eq(200)
-            expect(json['vote']).to eq('down')
+            xit 'returns 200 status' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+              expect(last_response.status).to eq(200)
+              expect(json['vote']).to eq('down')
+            end
           end
-        end
 
-        context 'when a user has already casted an upvote' do
-          before { post "/api/stories/#{@story1.id}/vote/down" }
+          context 'when a user has already voted down' do
+            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
-          xit 'returns 409 status and an expected error' do
-            post "/api/stories/#{@story1.id}/vote/down"
+            xit 'returns 409 status and an expected error' do
+              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-            expect(last_response.status).to eq(409)
-            expect(json['error']).to eq('You have already downvoted this story.')
+              expect(last_response.status).to eq(409)
+              expect(json['error']).to eq('You have already downvoted this story.')
+            end
           end
         end
       end
