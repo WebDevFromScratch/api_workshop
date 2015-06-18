@@ -8,4 +8,8 @@ gem 'pg'
 gem 'rake'
 gem 'dotenv'
 gem 'thin'
-gem 'rspec', group: :test
+
+group :test do
+  gem 'rspec'
+  gem 'database_cleaner'
+end
