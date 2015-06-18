@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'json'
 require 'dotenv'
 require 'active_record'
+require './models/story'
 
 ENV['RACK_ENV'] == 'test' ? Dotenv.load(File.expand_path('.env.test')) : Dotenv.load
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
