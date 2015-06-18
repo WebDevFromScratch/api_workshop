@@ -10,9 +10,8 @@ describe App do
 
   describe 'api' do
     before do
-      @story = Story.create!(id: 1, title: 'Lorem ipsum', url: 'http://www.lipsum.com/')
-      # @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
-      # @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
+      @story1 = Story.create(id: 1, title: 'Story 1', url: 'http://story1.com')
+      @story2 = Story.create(id: 2, title: 'Story 2', url: 'http://story2.net')
     end
 
     describe '/stories' do
@@ -28,20 +27,17 @@ describe App do
       describe 'GET /:id' do
         context 'a story exists' do
           it 'returns 200 status response and a story details' do
-            # get "/api/stories/#{@story1.id}"
-            get '/api/stories/1'
+            get "/api/stories/#{@story1.id}"
 
             expect(last_response.status).to eq(200)
-            # expect(json['url']).to eq(@story1.url)
-            # expect(json['title']).to eq(@story1.title)
-            expect(json['url']).to eq('http://story1.com')
-            expect(json['title']).to eq('Story 1')
+            expect(json['url']).to eq(@story1.url)
+            expect(json['title']).to eq(@story1.title)
           end
         end
 
         context 'a story doesn\'t exist' do
-          xit 'returns a 404 status response and an expected error' do
-            get '/api/stories/12223421231'
+          it 'returns a 404 status response and an expected error' do
+            get '/api/stories/12223'
 
             expect(last_response.status).to eq(404)
             expect(json['error']).to eq('The page you requested could not be found.')

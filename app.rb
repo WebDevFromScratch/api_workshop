@@ -8,29 +8,16 @@ ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 class App < Sinatra::Base
   get '/api/stories' do
-    content_type :json
-    {
-      stories: [
-        {
-          id: 1,
-          url: 'http://story1.com',
-          title: 'Story 1'
-        },
-        {
-          id: 2,
-          url: 'http://story2.net',
-          title: 'Story 2'
-        }
-      ]
-    }.to_json
+    {stories: Story.all}.to_json
   end
 
-  get '/api/stories/1' do
-    content_type :json
-    {
-      id: 1,
-      url: 'http://story1.com',
-      title: 'Story 1'
-    }.to_json
+  get '/api/stories/:id' do
+    begin
+      story = Story.find(params[:id])
+      story.to_json
+    rescue ActiveRecord::RecordNotFound
+      status 404
+      {error: 'The page you requested could not be found.'}.to_json
+    end
   end
 end
