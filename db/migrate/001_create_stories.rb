@@ -3,8 +3,8 @@ class CreateStories < ActiveRecord::Migration
     create_table :stories do |t|
       t.string :url
       t.string :title
-      
-      t.timestamps
+
+      t.timestamps null: false
     end
   end
 end
