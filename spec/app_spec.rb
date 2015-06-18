@@ -102,7 +102,7 @@ describe App do
         context 'when a user votes up' do
           context 'when a user has not voted yet' do
             xit 'returns 200 status' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(200)
               expect(json['vote']).to eq('up')
@@ -110,10 +110,10 @@ describe App do
           end
 
           context 'when a user has already voted down' do
-            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+            before { put "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
             xit 'returns 200 status' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(200)
               expect(json['vote']).to eq('up')
@@ -121,10 +121,10 @@ describe App do
           end
 
           context 'when a user has already voted up' do
-            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+            before { put "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
             xit 'returns 409 status and an expected error' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(409)
               expect(json['error']).to eq('You have already upvoted this story.')
@@ -135,7 +135,7 @@ describe App do
         context 'when a user votes down' do
           context 'when a user has not voted yet' do
             xit 'returns 200 status' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(200)
               expect(json['vote']).to eq('down')
@@ -143,10 +143,10 @@ describe App do
           end
 
           context 'when a user has already voted up' do
-            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+            before { put "/api/stories/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
             xit 'returns 200 status' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(200)
               expect(json['vote']).to eq('down')
@@ -154,10 +154,10 @@ describe App do
           end
 
           context 'when a user has already voted down' do
-            before { post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+            before { put "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
             xit 'returns 409 status and an expected error' do
-              post "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
+              put "/api/stories/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
               expect(last_response.status).to eq(409)
               expect(json['error']).to eq('You have already downvoted this story.')
