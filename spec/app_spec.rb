@@ -1,7 +1,6 @@
 require 'spec_helper'
 require 'rack/test'
 require 'json'
-require 'pry'
 
 describe App do
   include Rack::Test::Methods
@@ -19,8 +18,6 @@ describe App do
       describe 'GET /' do
         it 'returns 200 status response and a list of stories' do
           get '/api/stories'
-
-          binding.pry
 
           expect(last_response.status).to eq(200)
           expect(json['stories'].length).to eq(2)
