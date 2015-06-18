@@ -1,3 +1,3 @@
-require File.expand_path(File.join(*%w[ config environment ]), File.dirname(__FILE__) + '/app')
+require File.expand_path File.dirname(__FILE__) + '/app'
 
 run App

@@ -3,7 +3,7 @@ require 'json'
 require 'dotenv'
 require 'active_record'
 
-Dotenv.load
+ENV['RACK_ENV'] == 'test' ? Dotenv.load(File.expand_path('.env.test')) : Dotenv.load
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 class App < Sinatra::Base
