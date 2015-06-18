@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'json'
 
-class ApiWorkshop < Sinatra::Base
+class App < Sinatra::Base
   get '/api/stories' do
     content_type :json
     {

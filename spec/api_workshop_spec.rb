@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'rack/test'
 require 'json'
 
-describe ApiWorkshop do
+describe App do
   include Rack::Test::Methods
 
-  let(:api_app) { ApiWorkshop.new }
+  let(:api_app) { App.new }
   let(:app) { Rack::Lint.new(api_app) }
 
   describe 'api' do
