@@ -8,6 +8,10 @@ ENV['RACK_ENV'] == 'test' ? Dotenv.load(File.expand_path('.env.test')) : Dotenv.
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 class App < Sinatra::Base
+  before do
+    content_type 'application/json'
+  end
+
   get '/api/stories' do
     {stories: Story.all}.to_json
   end
