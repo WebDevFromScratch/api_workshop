@@ -82,7 +82,7 @@ describe App do
       describe 'PATCH /:id' do
         context 'with valid data' do
           xit 'returns 204 status' do
-            patch "/api/stories/#{@story1.id}", {body: 'new story body'}.to_json, 'CONTENT_TYPE' => 'application/json'
+            patch "/api/stories/#{@story1.id}", {title: 'new story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(204)
           end
@@ -90,10 +90,10 @@ describe App do
 
         context 'with invalid data' do
           xit 'returns 422 status and an expected error' do
-            patch "/api/stories/#{@story1.id}", {body: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
+            patch "/api/stories/#{@story1.id}", {title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(422)
-            expect(json['error']).to eq('A body is missing.')
+            expect(json['error']).to eq('A title is missing.')
           end
         end
       end
@@ -112,7 +112,7 @@ describe App do
         context 'when a user has already casted an upvote' do
           before { post "/api/stories/#{@story1.id}/vote/up" }
 
-          xit 'returns 409 status and an expected body' do
+          xit 'returns 409 status and an expected error' do
             post "/api/stories/#{@story1.id}/vote/up"
 
             expect(last_response.status).to eq(409)
@@ -134,7 +134,7 @@ describe App do
         context 'when a user has already casted an upvote' do
           before { post "/api/stories/#{@story1.id}/vote/down" }
 
-          xit 'returns 409 status and an expected body' do
+          xit 'returns 409 status and an expected error' do
             post "/api/stories/#{@story1.id}/vote/down"
 
             expect(last_response.status).to eq(409)
