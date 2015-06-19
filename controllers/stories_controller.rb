@@ -66,7 +66,7 @@ class StoriesController < ApplicationController
     story = Story.find(params[:id])
     vote_hash = JSON.parse(request.body.read)
 
-    if user_voted_on_story?(user.id, story.id)
+    if user.voted_on_story?(story.id)
       vote = user.votes.find_by(story_id: params[:id])
       vote.current_value = vote.value
     else
