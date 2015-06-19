@@ -52,22 +52,18 @@ class StoriesController < ApplicationController
 
   put '/:id/vote' do
     protected!
-
+    vote_hash = JSON.parse(request.body.read)
     user = User.find(params[:user_id])
     story = Story.find(params[:id])
-    vote_hash = JSON.parse(request.body.read)
 
     if user.voted_on_story?(story.id)
       vote = user.votes.find_by(story_id: params[:id])
       vote.current_value = vote.value
     else
-      vote = Vote.new(vote_hash)
+      vote = Vote.new()
     end
 
-    vote.new_value = vote_hash['value']
-    vote.value = vote.new_value
-    vote.user_id = user.id
-    vote.story_id = story.id
+    vote.update(new_value: vote_hash['value'], value: vote_hash['value'], user_id: user.id, story_id: story.id)
 
     if vote.save
       status 200
