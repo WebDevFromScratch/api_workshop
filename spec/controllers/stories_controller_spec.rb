@@ -31,6 +31,20 @@ describe StoriesController do
         expect(last_response.status).to eq(200)
         expect(json['url']).to eq(@story1.url)
         expect(json['title']).to eq(@story1.title)
+        expect(json['score']).to eq(0)
+      end
+
+      context 'and story score' do
+        before do
+          authorize 'John', 'secret123'
+          put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+        end
+
+        it 'updates correctly' do
+          get "/#{@story1.id}"
+
+          expect(json['score']).to eq(1)
+        end
       end
     end
 
