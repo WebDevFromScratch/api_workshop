@@ -10,8 +10,8 @@ describe StoriesController do
 
   describe 'api' do
     before do
-      @story1 = Story.create(id: 1, title: 'Story 1', url: 'http://story1.com')
-      @story2 = Story.create(id: 2, title: 'Story 2', url: 'http://story2.net')
+      @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
+      @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
     end
 
     describe 'GET /' do
@@ -46,31 +46,32 @@ describe StoriesController do
 
     describe 'POST /' do
       context 'with valid data' do
-        xit 'returns 201 status response and a story details' do
+        it 'returns 201 status response and a story details' do
           post '/', {url: 'story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(201)
-          # expect(last_response.header['Location']).to eq('')
+          expect(last_response.header['Location']).to eq("/api/stories/#{Story.last.id}")
           expect(json['url']).to eq('story url')
           expect(json['title']).to eq('story title')
         end
       end
 
       context 'with invalid data' do
-        xit 'returns 422 status and an expected error' do
+        it 'returns 422 status and an expected error' do
           post '/', {url: '', title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(422)
-          expect(json['error']).to eq('URL and/or title is missing.')
+          expect(json['url']).to include('can\'t be blank')
+          expect(json['title']).to include('can\'t be blank')
         end
       end
 
       context 'when a story url already exists in the database' do
-        xit 'returns 409 status and an expected error' do
+        it 'returns 409 status and an expected error' do
           post '/', {url: 'http://story1.com', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(409)
-          expect(json['error']).to eq('A story with this URL already exists.')
+          expect(json['url']).to include('has already been taken')
         end
       end
     end

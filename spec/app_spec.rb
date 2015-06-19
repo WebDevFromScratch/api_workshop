@@ -12,8 +12,8 @@ describe App do
 
   describe 'api' do
     before do
-      @story1 = Story.create(id: 1, title: 'Story 1', url: 'http://story1.com')
-      @story2 = Story.create(id: 2, title: 'Story 2', url: 'http://story2.net')
+      # @story1 = Story.create(id: 1, title: 'Story 1', url: 'http://story1.com')
+      # @story2 = Story.create(id: 2, title: 'Story 2', url: 'http://story2.net')
     end
 
     describe '/stories' do
