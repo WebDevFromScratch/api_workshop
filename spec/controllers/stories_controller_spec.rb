@@ -11,6 +11,7 @@ describe StoriesController do
   before do
     @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
     @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
+    @user = User.create(username: 'John', password: 'secret123')
   end
 
   describe 'GET /' do
@@ -44,33 +45,49 @@ describe StoriesController do
   end
 
   describe 'POST /' do
-    context 'with valid data' do
-      it 'returns 201 status response and a story details' do
+    context 'with an authorized user' do
+      before { authorize 'John', 'secret123' }
+
+      context 'with valid data' do
+        it 'returns 201 status response and a story details' do
+          post '/', {url: 'story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+          expect(last_response.status).to eq(201)
+          expect(last_response.header['Location']).to eq("/api/stories/#{Story.last.id}")
+          expect(json['url']).to eq('story url')
+          expect(json['title']).to eq('story title')
+        end
+      end
+
+      context 'with invalid data' do
+        it 'returns 422 status and an expected error' do
+          post '/', {url: '', title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+          expect(last_response.status).to eq(422)
+          expect(json['url']).to include('can\'t be blank')
+          expect(json['title']).to include('can\'t be blank')
+        end
+      end
+
+      context 'when a story url already exists in the database' do
+        it 'returns 409 status and an expected error' do
+          post '/', {url: 'http://story1.com', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+          expect(last_response.status).to eq(409)
+          expect(json['url']).to include('has already been taken')
+        end
+      end
+    end
+
+    context 'without an authorized user' do
+      before { authorize 'Menace', 'password' }
+
+      it 'returns 401 status response and an expected error' do
         post '/', {url: 'story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-        expect(last_response.status).to eq(201)
-        expect(last_response.header['Location']).to eq("/api/stories/#{Story.last.id}")
-        expect(json['url']).to eq('story url')
-        expect(json['title']).to eq('story title')
-      end
-    end
-
-    context 'with invalid data' do
-      it 'returns 422 status and an expected error' do
-        post '/', {url: '', title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
-
-        expect(last_response.status).to eq(422)
-        expect(json['url']).to include('can\'t be blank')
-        expect(json['title']).to include('can\'t be blank')
-      end
-    end
-
-    context 'when a story url already exists in the database' do
-      it 'returns 409 status and an expected error' do
-        post '/', {url: 'http://story1.com', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
-
-        expect(last_response.status).to eq(409)
-        expect(json['url']).to include('has already been taken')
+        expect(last_response.status).to eq(401)
+        expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+        expect(json['error']).to eq('Not authorized')
       end
     end
   end

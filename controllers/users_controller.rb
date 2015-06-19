@@ -1,8 +1,6 @@
 require 'sinatra/base'
 require './models/user'
 
-require 'pry'
-
 class UsersController < ApplicationController
   post '/' do
     user_hash = JSON.parse(request.body.read)
