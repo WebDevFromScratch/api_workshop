@@ -1,3 +1,9 @@
-require File.expand_path File.dirname(__FILE__) + '/app'
+require 'sinatra/base'
+require 'dotenv'
 
-run App
+require './app'
+Dir.glob('./{helpers,controllers}/*.rb').each { |file| require file }
+
+map('/') { run App }
+map('/api/') { run ApplicationController }
+map('/api/stories') { run StoriesController }

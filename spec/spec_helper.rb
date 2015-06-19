@@ -1,9 +1,10 @@
 ENV['RACK_ENV'] = 'test'
 
-$LOAD_PATH.unshift File.expand_path('../..', __FILE__)
-require 'app'
-require 'support/request_helpers'
 require 'database_cleaner'
+require 'support/request_helpers'
+require_relative '../app'
+require_relative '../controllers/application_controller'
+require_relative '../controllers/stories_controller'
 
 RSpec.configure do |config|
   config.include RequestHelpers

@@ -2,6 +2,8 @@ require 'spec_helper'
 require 'rack/test'
 require 'json'
 
+# this file will eventually be removed
+
 describe App do
   include Rack::Test::Methods
 
@@ -16,7 +18,7 @@ describe App do
 
     describe '/stories' do
       describe 'GET /' do
-        it 'returns 200 status response and a list of stories' do
+        xit 'returns 200 status response and a list of stories' do
           get '/api/stories'
 
           expect(last_response.status).to eq(200)
@@ -26,7 +28,7 @@ describe App do
 
       describe 'GET /:id' do
         context 'a story exists' do
-          it 'returns 200 status response and a story details' do
+          xit 'returns 200 status response and a story details' do
             get "/api/stories/#{@story1.id}"
 
             expect(last_response.status).to eq(200)
@@ -36,7 +38,7 @@ describe App do
         end
 
         context 'a story doesn\'t exist' do
-          it 'returns a 404 status response and an expected error' do
+          xit 'returns a 404 status response and an expected error' do
             get '/api/stories/12223'
 
             expect(last_response.status).to eq(404)
