@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require './models/story'
 
 class StoriesController < ApplicationController
   helpers do
@@ -13,9 +12,23 @@ class StoriesController < ApplicationController
       @auth ||=  Rack::Auth::Basic::Request.new(request.env)
       if @auth.provided? && @auth.basic? && @auth.credentials
         username,password = @auth.credentials
-
         user = User.find_by(username: username)
+        set_user_id_param(user.id) if user
+
         user && user.authenticate(password)
+      end
+    end
+
+    def set_user_id_param(id)
+      params[:user_id] = id
+    end
+
+    def user_voted_on_story?(user_id, story_id)
+      user = User.find(user_id)
+      if user.votes.find_by(story_id: story_id).nil?
+        false
+      else
+        true
       end
     end
   end
@@ -42,6 +55,36 @@ class StoriesController < ApplicationController
       errors = story.errors.messages
 
       (errors[:url] && errors[:url].include?('has already been taken')) ? status(409) : status(422)
+      errors.to_json
+    end
+  end
+
+  put '/:id/vote' do
+    protected!
+
+    user = User.find(params[:user_id])
+    story = Story.find(params[:id])
+    vote_hash = JSON.parse(request.body.read)
+
+    if user_voted_on_story?(user.id, story.id)
+      vote = user.votes.find_by(story_id: params[:id])
+      vote.current_value = vote.value
+    else
+      vote = Vote.new(vote_hash)
+    end
+
+    vote.new_value = vote_hash['value']
+    vote.value = vote.new_value
+    vote.user_id = user.id
+    vote.story_id = story.id
+
+    if vote.save
+      status 200
+      {value: vote.value, user_id: vote.user_id, story_id: vote.story_id}.to_json
+    else
+      errors = vote.errors.messages
+
+      status 409
       errors.to_json
     end
   end

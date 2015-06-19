@@ -112,69 +112,91 @@ describe StoriesController do
   end
 
   describe 'PUT /:id/vote' do
-    context 'when a user votes up' do
-      context 'when a user has not voted yet' do
-        xit 'returns 200 status' do
-          put "/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+    context 'with an authorized user' do
+      before { authorize 'John', 'secret123' }
 
-          expect(last_response.status).to eq(200)
-          expect(json['vote']).to eq('up')
+      context 'when a user votes up' do
+        context 'when a user has not voted yet' do
+          it 'returns 200 status and an expected response' do
+            put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(200)
+            expect(json['value']).to eq(1)
+            expect(json['user_id']).to eq(@user.id)
+            expect(json['story_id']).to eq(@story1.id)
+          end
+        end
+
+        context 'when a user has already voted down' do
+          before { put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+          it 'returns 200 status and an expected response' do
+            put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(200)
+            expect(json['value']).to eq(1)
+            expect(json['user_id']).to eq(@user.id)
+            expect(json['story_id']).to eq(@story1.id)
+          end
+        end
+
+        context 'when a user has already voted up' do
+          before { put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+          it 'returns 409 status and an expected error' do
+            put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(409)
+            expect(json['error']).to include('You have only one vote (up or down).')
+          end
         end
       end
 
-      context 'when a user has already voted down' do
-        before { put "/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+      context 'when a user votes down' do
+        context 'when a user has not voted yet' do
+          it 'returns 200 status' do
+            put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-        xit 'returns 200 status' do
-          put "/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
-
-          expect(last_response.status).to eq(200)
-          expect(json['vote']).to eq('up')
+            expect(last_response.status).to eq(200)
+            expect(json['value']).to eq(-1)
+            expect(json['user_id']).to eq(@user.id)
+            expect(json['story_id']).to eq(@story1.id)
+          end
         end
-      end
 
-      context 'when a user has already voted up' do
-        before { put "/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
+        context 'when a user has already voted up' do
+          before { put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
-        xit 'returns 409 status and an expected error' do
-          put "/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json'
+          it 'returns 200 status' do
+            put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-          expect(last_response.status).to eq(409)
-          expect(json['error']).to eq('You have already upvoted this story.')
+            expect(last_response.status).to eq(200)
+            expect(json['value']).to eq(-1)
+            expect(json['user_id']).to eq(@user.id)
+            expect(json['story_id']).to eq(@story1.id)
+          end
+        end
+
+        context 'when a user has already voted down' do
+          before { put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+          it 'returns 409 status and an expected error' do
+            put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(409)
+            expect(json['error']).to include('You have only one vote (up or down).')
+          end
         end
       end
     end
 
-    context 'when a user votes down' do
-      context 'when a user has not voted yet' do
-        xit 'returns 200 status' do
-          put "/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
+    context 'without an authorized user' do
+      it 'returns 401 status and an expected error' do
+        put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-          expect(last_response.status).to eq(200)
-          expect(json['vote']).to eq('down')
-        end
-      end
-
-      context 'when a user has already voted up' do
-        before { put "/#{@story1.id}/vote/", {vote: 'up'}.to_json, 'CONTENT_TYPE' => 'application/json' }
-
-        xit 'returns 200 status' do
-          put "/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
-
-          expect(last_response.status).to eq(200)
-          expect(json['vote']).to eq('down')
-        end
-      end
-
-      context 'when a user has already voted down' do
-        before { put "/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json' }
-
-        xit 'returns 409 status and an expected error' do
-          put "/#{@story1.id}/vote/", {vote: 'down'}.to_json, 'CONTENT_TYPE' => 'application/json'
-
-          expect(last_response.status).to eq(409)
-          expect(json['error']).to eq('You have already downvoted this story.')
-        end
+        expect(last_response.status).to eq(401)
+        expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+        expect(json['error']).to eq('Not authorized')
       end
     end
   end
