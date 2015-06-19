@@ -22,15 +22,6 @@ class StoriesController < ApplicationController
     def set_user_id_param(id)
       params[:user_id] = id
     end
-
-    def user_voted_on_story?(user_id, story_id)
-      user = User.find(user_id)
-      if user.votes.find_by(story_id: story_id).nil?
-        false
-      else
-        true
-      end
-    end
   end
 
   get '/' do
