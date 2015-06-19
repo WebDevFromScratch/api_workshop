@@ -216,22 +216,26 @@ describe StoriesController do
   end
 
   describe 'DELETE /:id/vote' do
-    context 'when a user already casted a vote' do
-      before { post "/#{@story1.id}/vote/up" }
+    context 'with an authorized user' do
+      before { authorize 'John', 'secret123' }
 
-      xit 'returns 204 status' do
-        delete "/#{@story1.id}/vote"
+      context 'when a user already casted a vote' do
+        before { put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
-        expect(last_response.status).to eq(204)
+        it 'returns 204 status' do
+          delete "/#{@story1.id}/vote"
+
+          expect(last_response.status).to eq(204)
+        end
       end
-    end
 
-    context 'when a user did not cast a vote yet' do
-      xit 'returns 422 status and an expected error' do
-        delete "/#{@story1.id}/vote"
+      context 'when a user did not cast a vote yet' do
+        it 'returns 422 status and an expected error' do
+          delete "/#{@story1.id}/vote"
 
-        expect(last_response.status).to eq(422)
-        expect(json['error']).to eq('You have not voted yet.')
+          expect(last_response.status).to eq(422)
+          expect(json['error']).to eq('You have not voted yet.')
+        end
       end
     end
   end

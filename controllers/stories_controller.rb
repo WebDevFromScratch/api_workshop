@@ -75,4 +75,20 @@ class StoriesController < ApplicationController
       errors.to_json
     end
   end
+
+  delete '/:id/vote' do
+    protected!
+    user = User.find(params[:id])
+    story = Story.find(params[:id])
+
+    if user.voted_on_story?(story.id)
+      vote = user.votes.find_by(story_id: params[:id])
+      vote.delete
+
+      status 204
+    else
+      status 422
+      {error: 'You have not voted yet.'}.to_json
+    end
+  end
 end
