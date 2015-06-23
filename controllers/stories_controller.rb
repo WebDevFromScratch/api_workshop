@@ -2,37 +2,6 @@ require 'sinatra/base'
 
 class StoriesController < ApplicationController
   helpers do
-    def protected!
-      return if authorized?
-      respond_with_unauthorized
-    end
-
-    def authorized?
-      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
-      if @auth.provided? && @auth.basic? && @auth.credentials
-        username,password = @auth.credentials
-        user = User.find_by(username: username)
-        set_user_id_param(user.id) if user
-
-        user && user.authenticate(password)
-      end
-    end
-
-    def format_response(response)
-      preferred_format = request.accept.first.to_s
-
-      if preferred_format == 'application/xml'
-        response.to_xml
-      else
-        response.to_json
-      end
-    end
-
-    def respond_with_unauthorized
-      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-      halt 401, format_response({error: 'Not authorized'})
-    end
-
     def set_user_id_param(id)
       params[:user_id] = id
     end
@@ -44,14 +13,10 @@ class StoriesController < ApplicationController
     def set_user
       User.find(params[:user_id])
     end
-
-    def parse_request_body(request_body)
-      JSON.parse(request_body)
-    end
   end
 
   get '/' do
-    format_response({stories: Story.all})
+    format_response(Story.all, 'stories')
   end
 
   post '/' do
@@ -65,18 +30,18 @@ class StoriesController < ApplicationController
     if story.save
       status 201
       headers 'Location' => "/api/stories/#{story.id}"
-      format_response({url: story.url, title: story.title})
+      format_response({url: story.url, title: story.title}, 'story')
     else
       errors = story.errors.messages
 
       (errors[:url] && errors[:url].include?('has already been taken')) ? status(409) : status(422)
-      format_response(errors)
+      format_response(errors, 'errors')
     end
   end
 
   get '/:id' do
     story = set_story
-    format_response(story)
+    format_response(story, 'story')
   end
 
   patch '/:id' do
@@ -95,7 +60,7 @@ class StoriesController < ApplicationController
       errors = story.errors.messages
 
       status 422
-      format_response(errors)
+      format_response(errors, 'errors')
     end
   end
 
@@ -118,12 +83,12 @@ class StoriesController < ApplicationController
     if vote.save
       story.reload
       status 200
-      format_response({value: vote.value, user_id: vote.user_id, story_id: vote.story_id})
+      format_response({value: vote.value, user_id: vote.user_id, story_id: vote.story_id}, 'vote')
     else
       errors = vote.errors.messages
 
       status 409
-      format_response(errors)
+      format_response(errors, 'errors')
     end
   end
 
@@ -141,7 +106,7 @@ class StoriesController < ApplicationController
       status 204
     else
       status 422
-      format_response({error: 'You have not voted yet.'})
+      format_response({error: 'You have not voted yet.'}, 'errors')
     end
   end
 end

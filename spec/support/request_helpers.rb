@@ -1,5 +1,9 @@
 module RequestHelpers
   def json
-    @json ||= JSON.parse(last_response.body)
+    JSON.parse(last_response.body)
+  end
+
+  def xml
+    Hash.from_xml(last_response.body)
   end
 end

@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'rack/test'
-require 'json'
 
 describe StoriesController do
   include Rack::Test::Methods
@@ -13,6 +12,16 @@ describe StoriesController do
     @another_user = User.create(username: 'Bob', password: 'password')
     @story1 = Story.create(title: 'Story 1', url: 'http://story1.com', user_id: @user.id)
     @story2 = Story.create(title: 'Story 2', url: 'http://story2.net', user_id: @user.id)
+  end
+
+  describe 'GET / with XML format' do
+    it 'returns 200 status response and a list of stories' do
+      header 'Accept', 'application/xml'
+      get '/'
+
+      expect(last_response.status).to eq(200)
+      expect(xml['stories'].length).to eq(2)
+    end
   end
 
   describe 'GET /' do
@@ -30,9 +39,9 @@ describe StoriesController do
         get "/#{@story1.id}"
 
         expect(last_response.status).to eq(200)
-        expect(json['url']).to eq(@story1.url)
-        expect(json['title']).to eq(@story1.title)
-        expect(json['score']).to eq(0)
+        expect(json['story']['url']).to eq(@story1.url)
+        expect(json['story']['title']).to eq(@story1.title)
+        expect(json['story']['score']).to eq(0)
       end
 
       context 'and story score' do
@@ -46,7 +55,7 @@ describe StoriesController do
           it 'updates correctly' do
             get "/#{@story1.id}"
 
-            expect(json['score']).to eq(1)
+            expect(json['story']['score']).to eq(1)
           end
         end
 
@@ -59,7 +68,7 @@ describe StoriesController do
           it 'updates correctly' do
             get "/#{@story1.id}"
 
-            expect(json['score']).to eq(-1)
+            expect(json['story']['score']).to eq(-1)
           end
         end
 
@@ -72,7 +81,7 @@ describe StoriesController do
           it 'updates correctly' do
             get "/#{@story1.id}"
 
-            expect(json['score']).to eq(0)
+            expect(json['story']['score']).to eq(0)
           end
         end
       end
@@ -83,7 +92,7 @@ describe StoriesController do
         get '/12223'
 
         expect(last_response.status).to eq(404)
-        expect(json['error']).to eq('The page you requested could not be found.')
+        expect(json['errors']['error']).to eq('The page you requested could not be found.')
       end
     end
   end
@@ -98,8 +107,8 @@ describe StoriesController do
 
           expect(last_response.status).to eq(201)
           expect(last_response.header['Location']).to eq("/api/stories/#{Story.last.id}")
-          expect(json['url']).to eq('story url')
-          expect(json['title']).to eq('story title')
+          expect(json['story']['url']).to eq('story url')
+          expect(json['story']['title']).to eq('story title')
         end
       end
 
@@ -108,8 +117,8 @@ describe StoriesController do
           post '/', {url: '', title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(422)
-          expect(json['url']).to include('can\'t be blank')
-          expect(json['title']).to include('can\'t be blank')
+          expect(json['errors']['url']).to include('can\'t be blank')
+          expect(json['errors']['title']).to include('can\'t be blank')
         end
       end
 
@@ -118,7 +127,7 @@ describe StoriesController do
           post '/', {url: 'http://story1.com', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(409)
-          expect(json['url']).to include('has already been taken')
+          expect(json['errors']['url']).to include('has already been taken')
         end
       end
     end
@@ -131,7 +140,7 @@ describe StoriesController do
 
         expect(last_response.status).to eq(401)
         expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
-        expect(json['error']).to eq('Not authorized')
+        expect(json['errors']['error']).to eq('Not authorized')
       end
     end
   end
@@ -154,7 +163,7 @@ describe StoriesController do
             patch "/#{@story1.id}", {title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(422)
-            expect(json['title']).to include('can\'t be blank')
+            expect(json['errors']['title']).to include('can\'t be blank')
           end
         end
       end
@@ -167,7 +176,7 @@ describe StoriesController do
 
           expect(last_response.status).to eq(401)
           expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
-          expect(json['error']).to eq('Not authorized')
+          expect(json['errors']['error']).to eq('Not authorized')
         end
       end
     end
@@ -178,7 +187,7 @@ describe StoriesController do
 
         expect(last_response.status).to eq(401)
         expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
-        expect(json['error']).to eq('Not authorized')
+        expect(json['errors']['error']).to eq('Not authorized')
       end
     end
   end
@@ -193,9 +202,9 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(200)
-            expect(json['value']).to eq(1)
-            expect(json['user_id']).to eq(@user.id)
-            expect(json['story_id']).to eq(@story1.id)
+            expect(json['vote']['value']).to eq(1)
+            expect(json['vote']['user_id']).to eq(@user.id)
+            expect(json['vote']['story_id']).to eq(@story1.id)
           end
         end
 
@@ -206,9 +215,9 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(200)
-            expect(json['value']).to eq(1)
-            expect(json['user_id']).to eq(@user.id)
-            expect(json['story_id']).to eq(@story1.id)
+            expect(json['vote']['value']).to eq(1)
+            expect(json['vote']['user_id']).to eq(@user.id)
+            expect(json['vote']['story_id']).to eq(@story1.id)
           end
         end
 
@@ -219,7 +228,7 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(409)
-            expect(json['error']).to include('You have only one vote (up or down).')
+            expect(json['errors']['error']).to include('You have only one vote (up or down).')
           end
         end
       end
@@ -230,9 +239,9 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(200)
-            expect(json['value']).to eq(-1)
-            expect(json['user_id']).to eq(@user.id)
-            expect(json['story_id']).to eq(@story1.id)
+            expect(json['vote']['value']).to eq(-1)
+            expect(json['vote']['user_id']).to eq(@user.id)
+            expect(json['vote']['story_id']).to eq(@story1.id)
           end
         end
 
@@ -243,9 +252,9 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(200)
-            expect(json['value']).to eq(-1)
-            expect(json['user_id']).to eq(@user.id)
-            expect(json['story_id']).to eq(@story1.id)
+            expect(json['vote']['value']).to eq(-1)
+            expect(json['vote']['user_id']).to eq(@user.id)
+            expect(json['vote']['story_id']).to eq(@story1.id)
           end
         end
 
@@ -256,7 +265,7 @@ describe StoriesController do
             put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(409)
-            expect(json['error']).to include('You have only one vote (up or down).')
+            expect(json['errors']['error']).to include('You have only one vote (up or down).')
           end
         end
       end
@@ -268,7 +277,7 @@ describe StoriesController do
 
         expect(last_response.status).to eq(401)
         expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
-        expect(json['error']).to eq('Not authorized')
+        expect(json['errors']['error']).to eq('Not authorized')
       end
     end
   end
@@ -292,7 +301,7 @@ describe StoriesController do
           delete "/#{@story1.id}/vote"
 
           expect(last_response.status).to eq(422)
-          expect(json['error']).to eq('You have not voted yet.')
+          expect(json['errors']['error']).to eq('You have not voted yet.')
         end
       end
     end
