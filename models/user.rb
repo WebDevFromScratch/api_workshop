@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   validates :password, presence: true, length: { minimum: 6 }
 
   has_many :votes
+  has_many :stories
 
   def voted_on_story?(story_id)
     self.votes.find_by(story_id: story_id).nil? ? false : true
