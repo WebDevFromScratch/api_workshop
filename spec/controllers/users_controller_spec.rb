@@ -15,7 +15,7 @@ describe UsersController do
 
         expect(last_response.status).to eq(201)
         expect(last_response.header['Location']).to eq("/api/users/#{User.last.id}")
-        expect(json['username']).to eq('JohnDoe')
+        expect(json['user']['username']).to eq('JohnDoe')
       end
     end
 
@@ -24,8 +24,8 @@ describe UsersController do
         post '/', {username: '', password: 'short'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
         expect(last_response.status).to eq(422)
-        expect(json['username']).to include('can\'t be blank')
-        expect(json['password']).to include('is too short (minimum is 6 characters)')
+        expect(json['errors']['username']).to include('can\'t be blank')
+        expect(json['errors']['password']).to include('is too short (minimum is 6 characters)')
       end
     end
 
@@ -36,7 +36,7 @@ describe UsersController do
         post '/', {username: 'JohnDoe', password: 'secret567'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
         expect(last_response.status).to eq(409)
-        expect(json['username']).to include('has already been taken')
+        expect(json['errors']['username']).to include('has already been taken')
       end
     end
   end
