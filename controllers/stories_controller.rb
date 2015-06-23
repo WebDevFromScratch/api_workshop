@@ -66,6 +66,7 @@ class StoriesController < ApplicationController
     vote.update(new_value: vote_hash['value'], value: vote_hash['value'], user_id: user.id, story_id: story.id)
 
     if vote.save
+      story.reload
       status 200
       {value: vote.value, user_id: vote.user_id, story_id: vote.story_id}.to_json
     else
@@ -83,8 +84,9 @@ class StoriesController < ApplicationController
 
     if user.voted_on_story?(story.id)
       vote = user.votes.find_by(story_id: params[:id])
-      vote.delete
 
+      vote.delete
+      story.reload
       status 204
     else
       status 422

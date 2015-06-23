@@ -37,13 +37,42 @@ describe StoriesController do
       context 'and story score' do
         before do
           authorize 'John', 'secret123'
-          put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
         end
 
-        it 'updates correctly' do
-          get "/#{@story1.id}"
+        context 'after adding a vote' do
+          before { put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json' }
 
-          expect(json['score']).to eq(1)
+          it 'updates correctly' do
+            get "/#{@story1.id}"
+
+            expect(json['score']).to eq(1)
+          end
+        end
+
+        context 'after changing a vote' do
+          before do
+            put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+            put "/#{@story1.id}/vote", {value: -1}.to_json, 'CONTENT_TYPE' => 'application/json'
+          end
+
+          it 'updates correctly' do
+            get "/#{@story1.id}"
+
+            expect(json['score']).to eq(-1)
+          end
+        end
+
+        context 'after removing a vote' do
+          before do
+            put "/#{@story1.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
+            delete "/#{@story1.id}/vote"
+          end
+
+          it 'updates correctly' do
+            get "/#{@story1.id}"
+
+            expect(json['score']).to eq(0)
+          end
         end
       end
     end
