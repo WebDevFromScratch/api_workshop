@@ -10,8 +10,8 @@ describe StoriesController do
   before do
     @user = User.create(username: 'John', password: 'secret123')
     @another_user = User.create(username: 'Bob', password: 'password')
-    @story1 = Story.create(title: 'Story 1', url: 'http://story1.com', user_id: @user.id)
-    @story2 = Story.create(title: 'Story 2', url: 'http://story2.net', user_id: @user.id)
+    @story1 = Story.create(title: 'Story 1', url: 'http://story1.com/', user_id: @user.id)
+    @story2 = Story.create(title: 'Story 2', url: 'http://story2.net/', user_id: @user.id)
   end
 
   describe 'GET / with XML format' do
@@ -124,7 +124,7 @@ describe StoriesController do
 
       context 'when a story url already exists in the database' do
         it 'returns 409 status and an expected error' do
-          post '/', {url: 'http://story1.com', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+          post '/', {url: "#{@story1.url}", title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
           expect(last_response.status).to eq(409)
           expect(json['errors']['url']).to include('has already been taken')
@@ -304,6 +304,16 @@ describe StoriesController do
           expect(json['errors']['error']).to eq('You have not voted yet.')
         end
       end
+    end
+  end
+
+  describe 'GET /:id/url' do
+    it 'returns 303 status and redirect to an expected url' do
+      get "/#{@story1.id}/url"
+
+      expect(last_response.status).to eq(303)
+      follow_redirect!
+      expect(last_request.url).to eq(@story1.url)
     end
   end
 end

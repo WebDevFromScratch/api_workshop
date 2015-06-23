@@ -109,4 +109,10 @@ class StoriesController < ApplicationController
       format_response({error: 'You have not voted yet.'}, 'errors')
     end
   end
+
+  get '/:id/url' do
+    story = set_story
+
+    redirect to(story.url), 303
+  end
 end
