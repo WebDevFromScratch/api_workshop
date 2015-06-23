@@ -18,9 +18,19 @@ class StoriesController < ApplicationController
       end
     end
 
+    def format_response(response)
+      preferred_format = request.accept.first.to_s
+
+      if preferred_format == 'application/xml'
+        response.to_xml
+      else
+        response.to_json
+      end
+    end
+
     def respond_with_unauthorized
       headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-      halt 401, {error: 'Not authorized'}.to_json
+      halt 401, format_response({error: 'Not authorized'})
     end
 
     def set_user_id_param(id)
@@ -41,7 +51,7 @@ class StoriesController < ApplicationController
   end
 
   get '/' do
-    {stories: Story.all}.to_json
+    format_response({stories: Story.all})
   end
 
   post '/' do
@@ -55,18 +65,18 @@ class StoriesController < ApplicationController
     if story.save
       status 201
       headers 'Location' => "/api/stories/#{story.id}"
-      {url: story.url, title: story.title}.to_json
+      format_response({url: story.url, title: story.title})
     else
       errors = story.errors.messages
 
       (errors[:url] && errors[:url].include?('has already been taken')) ? status(409) : status(422)
-      errors.to_json
+      format_response(errors)
     end
   end
 
   get '/:id' do
     story = set_story
-    story.to_json
+    format_response(story)
   end
 
   patch '/:id' do
@@ -85,7 +95,7 @@ class StoriesController < ApplicationController
       errors = story.errors.messages
 
       status 422
-      errors.to_json
+      format_response(errors)
     end
   end
 
@@ -108,12 +118,12 @@ class StoriesController < ApplicationController
     if vote.save
       story.reload
       status 200
-      {value: vote.value, user_id: vote.user_id, story_id: vote.story_id}.to_json
+      format_response({value: vote.value, user_id: vote.user_id, story_id: vote.story_id})
     else
       errors = vote.errors.messages
 
       status 409
-      errors.to_json
+      format_response(errors)
     end
   end
 
@@ -131,7 +141,7 @@ class StoriesController < ApplicationController
       status 204
     else
       status 422
-      {error: 'You have not voted yet.'}.to_json
+      format_response({error: 'You have not voted yet.'})
     end
   end
 end

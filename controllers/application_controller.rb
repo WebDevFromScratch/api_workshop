@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'active_record'
 require 'json'
+require 'active_support'
 
 class ApplicationController < Sinatra::Base
   set :show_exceptions, false
