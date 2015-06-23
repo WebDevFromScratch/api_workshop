@@ -9,9 +9,10 @@ describe StoriesController do
   let(:app) { Rack::Lint.new(controller) }
 
   before do
-    @story1 = Story.create(title: 'Story 1', url: 'http://story1.com')
-    @story2 = Story.create(title: 'Story 2', url: 'http://story2.net')
     @user = User.create(username: 'John', password: 'secret123')
+    @another_user = User.create(username: 'Bob', password: 'password')
+    @story1 = Story.create(title: 'Story 1', url: 'http://story1.com', user_id: @user.id)
+    @story2 = Story.create(title: 'Story 2', url: 'http://story2.net', user_id: @user.id)
   end
 
   describe 'GET /' do
@@ -136,20 +137,48 @@ describe StoriesController do
   end
 
   describe 'PATCH /:id' do
-    context 'with valid data' do
-      xit 'returns 204 status' do
-        patch "/#{@story1.id}", {title: 'new story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+    context 'with an authorized user' do
+      context 'who is an autor of the story' do
+        before { authorize 'John', 'secret123' }
 
-        expect(last_response.status).to eq(204)
+        context 'with valid data' do
+          it 'returns 204 status' do
+            patch "/#{@story1.id}", {title: 'new story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(204)
+          end
+        end
+
+        context 'with invalid data' do
+          it 'returns 422 status and an expected error' do
+            patch "/#{@story1.id}", {title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+            expect(last_response.status).to eq(422)
+            expect(json['title']).to include('can\'t be blank')
+          end
+        end
+      end
+
+      context 'who is not an author of the story' do
+        before { authorize 'Bob', 'password' }
+
+        it 'returns 401 status response and an expected error' do
+          patch "/#{@story1.id}", {title: 'new story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+
+          expect(last_response.status).to eq(401)
+          expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+          expect(json['error']).to eq('Not authorized')
+        end
       end
     end
 
-    context 'with invalid data' do
-      xit 'returns 422 status and an expected error' do
-        patch "/#{@story1.id}", {title: ''}.to_json, 'CONTENT_TYPE' => 'application/json'
+    context 'without an authorized user' do
+      it 'returns 401 status response and an expected error' do
+        patch "/#{@story1.id}", {title: 'new story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
 
-        expect(last_response.status).to eq(422)
-        expect(json['error']).to eq('A title is missing.')
+        expect(last_response.status).to eq(401)
+        expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+        expect(json['error']).to eq('Not authorized')
       end
     end
   end
