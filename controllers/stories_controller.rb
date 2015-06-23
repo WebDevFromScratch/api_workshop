@@ -26,6 +26,18 @@ class StoriesController < ApplicationController
     def set_user_id_param(id)
       params[:user_id] = id
     end
+
+    def set_story
+      Story.find(params[:id])
+    end
+
+    def set_user
+      User.find(params[:user_id])
+    end
+
+    def parse_request_body(request_body)
+      JSON.parse(request_body)
+    end
   end
 
   get '/' do
@@ -34,9 +46,10 @@ class StoriesController < ApplicationController
 
   post '/' do
     protected!
-    story_hash = JSON.parse(request.body.read)
+
+    story_hash = parse_request_body(request.body.read)
     story = Story.new(story_hash)
-    user = User.find(params[:user_id])
+    user = set_user
     story.user = user
 
     if story.save
@@ -52,16 +65,16 @@ class StoriesController < ApplicationController
   end
 
   get '/:id' do
-    story = Story.find(params[:id])
+    story = set_story
     story.to_json
   end
 
   patch '/:id' do
     protected!
-    story_hash = JSON.parse(request.body.read)
-    story = Story.find(params[:id])
-    user = User.find(params[:user_id])
-    current_title = story.title
+
+    story_hash = parse_request_body(request.body.read)
+    story = set_story
+    user = set_user
     story.title = story_hash['title']
 
     if user == story.user && story.save
@@ -78,9 +91,10 @@ class StoriesController < ApplicationController
 
   put '/:id/vote' do
     protected!
-    vote_hash = JSON.parse(request.body.read)
-    user = User.find(params[:user_id])
-    story = Story.find(params[:id])
+
+    vote_hash = parse_request_body(request.body.read)
+    story = set_story
+    user = set_user
 
     if user.voted_on_story?(story.id)
       vote = user.votes.find_by(story_id: params[:id])
@@ -105,8 +119,9 @@ class StoriesController < ApplicationController
 
   delete '/:id/vote' do
     protected!
-    user = User.find(params[:user_id])
-    story = Story.find(params[:id])
+
+    story = set_story
+    user = set_user
 
     if user.voted_on_story?(story.id)
       vote = user.votes.find_by(story_id: params[:id])
