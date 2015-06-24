@@ -1,10 +1,10 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe StoriesController do
+describe V2::StoriesController do
   include Rack::Test::Methods
 
-  let(:controller) { StoriesController.new }
+  let(:controller) { V2::StoriesController.new }
   let(:app) { Rack::Lint.new(controller) }
 
   before do

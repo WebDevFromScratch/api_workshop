@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'rack/test'
 require 'json'
 
-describe UsersController do
+describe V2::UsersController do
   include Rack::Test::Methods
 
-  let(:controller) { UsersController.new }
+  let(:controller) { V2::UsersController.new }
   let(:app) { Rack::Lint.new(controller) }
 
   describe 'POST /' do
