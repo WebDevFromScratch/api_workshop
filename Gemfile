@@ -9,6 +9,8 @@ gem 'rake'
 gem 'dotenv'
 gem 'thin'
 gem 'bcrypt', '~> 3.1.7'
+gem 'sinatra-router'
+gem 'sinatra-contrib'
 
 group :test do
   gem 'rspec'
