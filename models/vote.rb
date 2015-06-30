@@ -1,7 +1,7 @@
 class Vote < ActiveRecord::Base
   attr_accessor :new_value, :current_value
 
-  belongs_to :story
+  belongs_to :story, counter_cache: true
   belongs_to :user
 
   validate :can_still_vote?

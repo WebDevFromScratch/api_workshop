@@ -18,7 +18,7 @@ module V2
       end
 
       get '/' do
-        format_response(Story.all, 'stories')
+        format_response(Story.sorted_by_votes.limit(10), 'stories')
       end
 
       post '/' do
@@ -96,6 +96,7 @@ module V2
         vote.update(new_value: vote_hash['value'], value: vote_hash['value'], user_id: user.id, story_id: story.id)
 
         if vote.save
+          story.votes_count += 1
           story.reload
           status 200
           format_response({value: vote.value, user_id: vote.user_id, story_id: vote.story_id}, 'vote')
