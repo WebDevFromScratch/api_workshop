@@ -198,6 +198,42 @@ describe V2::StoriesController do
       end
     end
 
+    describe 'DELETE /:id' do
+      context 'with an authorized user' do
+        context 'who is an autor of the story' do
+          before { authorize 'John', 'secret123' }
+
+          it 'returns 204 status' do
+            delete "/stories/#{@story1.id}"
+
+            expect(last_response.status).to eq(204)
+          end
+        end
+
+        context 'who is not an author of the story' do
+          before { authorize 'Bob', 'password' }
+
+          it 'returns 401 status response and an expected error' do
+            delete "/stories/#{@story1.id}"
+
+            expect(last_response.status).to eq(401)
+            expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+            expect(json['errors']['error']).to eq('Not authorized')
+          end
+        end
+      end
+
+      context 'without an authorized user' do
+        it 'returns 401 status response and an expected error' do
+          delete "/stories/#{@story1.id}"
+
+          expect(last_response.status).to eq(401)
+          expect(last_response.header['WWW-Authenticate']).to eq('Basic realm="Restricted Area"')
+          expect(json['errors']['error']).to eq('Not authorized')
+        end
+      end
+    end
+
     describe 'PUT /:id/vote' do
       context 'with an authorized user' do
         before { authorize 'John', 'secret123' }

@@ -66,6 +66,19 @@ module V2
         end
       end
 
+      delete '/:id' do
+        protected!
+
+        story = set_story
+        user = set_user
+
+        if user == story.user && story.delete
+          status 204
+        else
+          respond_with_unauthorized
+        end
+      end
+
       put '/:id/vote' do
         protected!
 
