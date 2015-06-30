@@ -3,7 +3,7 @@ ENV['RACK_ENV'] = 'test'
 require 'database_cleaner'
 require 'support/request_helpers'
 require './app'
-Dir["./controllers/*.rb"].each {|file| require file }
+Dir["./v*/controllers/*.rb"].each {|file| require file }
 
 RSpec.configure do |config|
   config.include RequestHelpers

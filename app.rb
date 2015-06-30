@@ -18,7 +18,6 @@ class App < Sinatra::Base
     end
 
     def api_version(accept_header)
-      p 'GOT HERE'
       accept_header.split('.').last.split('+').first.capitalize
     end
 
