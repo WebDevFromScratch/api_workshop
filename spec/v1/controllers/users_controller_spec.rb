@@ -9,9 +9,11 @@ describe V1::UsersController do
   let(:app) { Rack::Lint.new(controller) }
 
   describe 'POST /' do
+    before { header 'Accept', 'application/vnd.api_workshop.v2+json' }
+
     context 'with valid data' do
       it 'returns 201 status' do
-        post '/', {username: 'JohnDoe', password: 'secret123'}.to_json, 'CONTENT_TYPE' => 'application/json'
+        post '/users/', {username: 'JohnDoe', password: 'secret123'}.to_json
 
         expect(last_response.status).to eq(201)
         expect(last_response.header['Location']).to eq("/api/users/#{User.last.id}")
@@ -21,7 +23,7 @@ describe V1::UsersController do
 
     context 'with invalid data' do
       it 'returns 422 status and an expected error' do
-        post '/', {username: '', password: 'short'}.to_json, 'CONTENT_TYPE' => 'application/json'
+        post '/users/', {username: '', password: 'short'}.to_json
 
         expect(last_response.status).to eq(422)
         expect(json['errors']['username']).to include('can\'t be blank')
@@ -33,7 +35,7 @@ describe V1::UsersController do
       before { User.create(username: 'JohnDoe', password: 'secret123') }
 
       it 'returns 409 status and an expected error' do
-        post '/', {username: 'JohnDoe', password: 'secret567'}.to_json, 'CONTENT_TYPE' => 'application/json'
+        post '/users/', {username: 'JohnDoe', password: 'secret567'}.to_json
 
         expect(last_response.status).to eq(409)
         expect(json['errors']['username']).to include('has already been taken')
