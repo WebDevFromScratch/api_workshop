@@ -21,12 +21,20 @@ class App < Sinatra::Base
       accept_header.split('.').last.split('+').first.capitalize
     end
 
-    with_conditions(
-      lambda { |e| valid_accept_header?(e['HTTP_ACCEPT']) && api_version(e['HTTP_ACCEPT']) == 'V2' }
-      end
-    ) do
+    def version(version, &block)
+      condition = lambda { |e| valid_accept_header?(e['HTTP_ACCEPT']) && version == api_version(e['HTTP_ACCEPT']) }
+
+      block ? with_conditions(condition, &block) : condition
+    end
+
+    version 'V2' do
       mount V2::StoriesController
       mount V2::UsersController
+    end
+
+    version 'V1' do
+      mount V1::StoriesController
+      mount V2::StoriesController
     end
   end
 end
