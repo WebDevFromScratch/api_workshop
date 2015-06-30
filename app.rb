@@ -18,6 +18,7 @@ class App < Sinatra::Base
     end
 
     def api_version(accept_header)
+      p 'GOT HERE'
       accept_header.split('.').last.split('+').first.capitalize
     end
 
@@ -34,7 +35,7 @@ class App < Sinatra::Base
 
     version 'V1' do
       mount V1::StoriesController
-      mount V2::StoriesController
+      mount V1::UsersController
     end
   end
 end
