@@ -1,9 +1,12 @@
 require 'sinatra/base'
+require 'sinatra/namespace'
 require 'active_record'
 require 'json'
 
 module V1
   class ApplicationController < Sinatra::Base
+    register Sinatra::Namespace
+
     set :show_exceptions, false
 
     helpers do
@@ -25,7 +28,7 @@ module V1
       end
 
       def format_response(response, root)
-        preferred_format == 'application/xml' ? response.to_xml(root: root) : {"#{root}": response}.to_json
+        preferred_format == 'xml' ? response.to_xml(root: root) : {"#{root}": response}.to_json
       end
 
       def respond_with_unauthorized
@@ -34,10 +37,14 @@ module V1
       end
 
       def parse_request_body(request_body)
-        preferred_format == 'application/xml' ? Hash.from_xml(request_body) : JSON.parse(request_body)
+        preferred_format == 'xml' ? Hash.from_xml(request_body) : JSON.parse(request_body)
       end
 
       def preferred_format
+        preferred_accept_header.split('+').last
+      end
+
+      def preferred_accept_header
         request.accept.first.to_s
       end
     end
@@ -45,10 +52,6 @@ module V1
     error ActiveRecord::RecordNotFound do
       status 404
       format_response({error: 'The page you requested could not be found.'}, 'errors')
-    end
-
-    before do
-      content_type 'application/json'
     end
   end
 end
