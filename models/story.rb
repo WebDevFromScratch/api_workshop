@@ -1,8 +1,10 @@
 class Story < ActiveRecord::Base
-  validates :url, presence: true, uniqueness: true
-  validates :title, presence: true
+  before_save :update_board
 
-  belongs_to :board
+  validates :url, presence: true, uniqueness: true
+  validates_presence_of :title, :user_id, :board_id
+
+  belongs_to :board, touch: true
   belongs_to :user
   has_many :votes
 
@@ -18,5 +20,11 @@ class Story < ActiveRecord::Base
     votes_scores = self.votes.map {|vote| vote.value}
     votes_scores.each { |vote_score| total_score += vote_score }
     total_score
+  end
+
+  private
+
+  def update_board
+    self.board.touch
   end
 end

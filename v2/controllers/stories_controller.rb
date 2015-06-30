@@ -15,9 +15,15 @@ module V2
         def set_user
           User.find(params[:user_id])
         end
+
+        def set_board
+          Board.first # then there always has to be at least one board
+        end
       end
 
       get '/' do
+        board = set_board
+        last_modified(board.updated_at)
         format_response(Story.sorted_by_votes.limit(10), 'stories')
       end
 

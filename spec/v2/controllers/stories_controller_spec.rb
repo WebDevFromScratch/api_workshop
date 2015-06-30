@@ -9,8 +9,9 @@ describe V2::StoriesController do
 
   let!(:user) { User.create(username: 'John', password: 'secret123') }
   let!(:another_user) { User.create(username: 'Bob', password: 'password') }
-  let!(:story1) { Story.create(title: 'Story 1', url: 'http://story1.com/', user_id: user.id) }
-  let!(:story2) { Story.create(title: 'Story 2', url: 'http://story2.net/', user_id: user.id) }
+  let!(:board) { Board.create(name: 'Default') }
+  let!(:story1) { Story.create(title: 'Story 1', url: 'http://story1.com/', user_id: user.id, board_id: board.id) }
+  let!(:story2) { Story.create(title: 'Story 2', url: 'http://story2.net/', user_id: user.id, board_id: board.id) }
 
   context 'with XML format' do
     before { header 'Accept', 'application/vnd.api_workshop.v2+xml' }
@@ -30,7 +31,7 @@ describe V2::StoriesController do
 
     describe 'GET /' do
       before do
-        10.times { Story.create(title: ('a'..'z').to_a.shuffle[0,8].join, url: ('a'..'z').to_a.shuffle[0,8].join) }
+        10.times { Story.create(title: ('a'..'z').to_a.shuffle[0,8].join, url: ('a'..'z').to_a.shuffle[0,8].join, user_id: user.id, board_id: board.id) }
         authorize 'John', 'secret123'
         put "/stories/#{Story.last.id}/vote", {value: 1}.to_json, 'CONTENT_TYPE' => 'application/json'
       end
@@ -39,18 +40,20 @@ describe V2::StoriesController do
         get '/stories/'
 
         expect(last_response.status).to eq(200)
+        expect(last_response.header).to include('Last-Modified')
         expect(json['stories'].length).to eq(10)
         expect(json['stories'].first['id']).to eq(Story.last.id)
       end
     end
 
     describe 'GET /recent' do
-      before { 10.times { Story.create(title: ('a'..'z').to_a.shuffle[0,8].join, url: ('a'..'z').to_a.shuffle[0,8].join) } }
+      before { 10.times { Story.create(title: ('a'..'z').to_a.shuffle[0,8].join, url: ('a'..'z').to_a.shuffle[0,8].join, user_id: user.id, board_id: board.id) } }
 
       it 'returns 200 status response and a list of 10 recent stories' do
         get '/stories/recent'
 
         expect(last_response.status).to eq(200)
+        expect(last_response.header).to include('Cache-Control')
         expect(json['stories'].length).to eq(10)
         expect(json['stories'].first['id']).to eq(Story.last.id)
       end
@@ -126,7 +129,7 @@ describe V2::StoriesController do
 
         context 'with valid data' do
           it 'returns 201 status response and a story details' do
-            post '/stories/', {url: 'story url', title: 'story title'}.to_json, 'CONTENT_TYPE' => 'application/json'
+            post '/stories/', {url: 'story url', title: 'story title', board_id: board.id }.to_json, 'CONTENT_TYPE' => 'application/json'
 
             expect(last_response.status).to eq(201)
             expect(last_response.header['Location']).to eq("/api/stories/#{Story.last.id}")
