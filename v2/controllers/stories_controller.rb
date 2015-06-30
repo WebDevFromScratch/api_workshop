@@ -22,6 +22,7 @@ module V2
       end
 
       get '/recent' do
+        cache_control :public, max_age: 30
         format_response(Story.sorted_by_recent.limit(10), 'stories')
       end
 
