@@ -21,6 +21,10 @@ module V2
         format_response(Story.sorted_by_votes.limit(10), 'stories')
       end
 
+      get '/recent' do
+        format_response(Story.sorted_by_recent.limit(10), 'stories')
+      end
+
       post '/' do
         protected!
 

@@ -44,6 +44,18 @@ describe V2::StoriesController do
       end
     end
 
+    describe 'GET /recent' do
+      before { 10.times { Story.create(title: ('a'..'z').to_a.shuffle[0,8].join, url: ('a'..'z').to_a.shuffle[0,8].join) } }
+
+      it 'returns 200 status response and a list of 10 recent stories' do
+        get '/stories/recent'
+
+        expect(last_response.status).to eq(200)
+        expect(json['stories'].length).to eq(10)
+        expect(json['stories'].first['id']).to eq(Story.last.id)
+      end
+    end
+
     describe 'GET /:id' do
       context 'a story exists' do
         it 'returns 200 status response and a story details' do

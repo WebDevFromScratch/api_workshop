@@ -5,9 +5,8 @@ class Story < ActiveRecord::Base
   belongs_to :user
   has_many :votes
 
-  def self.sorted_by_votes
-    order('votes_count DESC')
-  end
+  scope :sorted_by_votes, -> { order('votes_count DESC') }
+  scope :sorted_by_recent, -> { order('created_at DESC') }
 
   def attributes
     super.merge(score: self.score)
