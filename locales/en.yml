@@ -206,4 +206,5 @@ en:
 
   error_401: 'Not authorized'
   error_404: 'The page you requested could not be found.'
+  error_unsupported_lang: 'The language requested by your browser is not supported.'
   error_not_voted: 'You have not voted yet.'

@@ -36,6 +36,10 @@ module V2
         halt 401, format_response({error: I18n.t(:error_401)}, 'errors')
       end
 
+      def respond_with_unacceptable
+        halt 406, format_response({error: I18n.t(:error_unsupported_lang)}, 'errors')
+      end
+
       def parse_request_body(request_body)
         preferred_format == 'xml' ? Hash.from_xml(request_body) : JSON.parse(request_body)
       end
@@ -70,7 +74,8 @@ module V2
 
       def set_locale
         locale = env.http_accept_language.preferred_language_from(I18n.available_locales)
-        I18n.locale = locale unless locale.nil?
+
+        locale.nil? ? respond_with_unacceptable : I18n.locale = locale
       end
     end
 

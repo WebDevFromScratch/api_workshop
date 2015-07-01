@@ -238,4 +238,5 @@ pl:
 
   error_401: 'Brak autoryzacji'
   error_404: 'Strona, której szukasz nie istnieje.'
+  error_unsupported_lang: 'Język Twojego zapytania nie jest obsługiwany.'
   error_not_voted: 'Jeszcze nie oddałeś swojego głosu.'
