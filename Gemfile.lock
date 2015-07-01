@@ -118,6 +118,7 @@ DEPENDENCIES
   dalli
   database_cleaner
   dotenv
+  i18n
   kaminari
   pg
   pry

@@ -14,6 +14,7 @@ gem 'sinatra-contrib'
 gem 'rack-cache'
 gem 'dalli'
 gem 'kaminari'
+gem 'i18n'
 
 group :test do
   gem 'rspec'
