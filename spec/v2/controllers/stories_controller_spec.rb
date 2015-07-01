@@ -41,6 +41,7 @@ describe V2::StoriesController do
 
         expect(last_response.status).to eq(200)
         expect(last_response.header).to include('Last-Modified')
+        expect(last_response.header).to include('Link')
         expect(json['stories'].length).to eq(10)
         expect(json['stories'].first['id']).to eq(Story.last.id)
       end
