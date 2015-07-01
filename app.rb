@@ -2,11 +2,14 @@ require 'sinatra/base'
 require 'sinatra/router'
 require 'dalli'
 require 'rack-cache'
+require 'kaminari'
 require './config/environment'
 Dir.glob('./{models,controllers}/*.rb').each { |file| require file }
 Dir.glob('./v*/{models,controllers}/*.rb').each { |file| require file }
 
 class App < Sinatra::Base
+  Kaminari::Hooks.init
+
   use Sinatra::Router do
     def valid_accept_header?(accept_header)
       valid_formats = ['json', 'xml', '*/*']

@@ -23,8 +23,11 @@ module V2
 
       get '/' do
         board = set_board
+        stories = Story.sorted_by_votes.page(params[:page]).per(10)
+
         last_modified(board.updated_at)
-        format_response(Story.sorted_by_votes.limit(10), 'stories')
+        set_pagination_header(stories)
+        format_response(stories, 'stories')
       end
 
       get '/recent' do

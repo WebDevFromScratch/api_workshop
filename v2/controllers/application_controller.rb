@@ -47,6 +47,26 @@ module V2
       def preferred_accept_header
         request.accept.first.to_s
       end
+
+      def set_pagination_header(resource)
+        page = {}
+        page[:first] = 1 if resource.total_pages > 1 && !resource.first_page?
+        page[:last] = resource.total_pages if resource.total_pages > 1 && !resource.last_page?
+        page[:next] = resource.current_page + 1 unless resource.last_page?
+        page[:prev] = resource.current_page - 1 unless resource.first_page?
+
+        http_scheme = request.env['rack.url_scheme']
+        host = request.env['HTTP_HOST']
+        relative_path = request.env['REQUEST_PATH']
+        full_path = "#{http_scheme}://#{host}#{relative_path}"
+        pagination_links = []
+
+        page.each do |key, value|
+          pagination_links << "<#{full_path}?page=#{value}>; rel=\"#{key}\""
+        end
+
+        headers['Link'] = pagination_links.join(', ')
+      end
     end
 
     error ActiveRecord::RecordNotFound do
