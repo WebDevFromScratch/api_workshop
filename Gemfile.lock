@@ -20,6 +20,7 @@ GEM
     builder (3.2.2)
     coderay (1.1.0)
     daemons (1.2.2)
+    dalli (2.7.4)
     database_cleaner (1.4.1)
     diff-lcs (1.2.5)
     dotenv (2.0.0)
@@ -35,6 +36,8 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rack (1.6.1)
+    rack-cache (1.2)
+      rack (>= 0.4)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
@@ -82,10 +85,12 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   bcrypt (~> 3.1.7)
+  dalli
   database_cleaner
   dotenv
   pg
   pry
+  rack-cache
   rack-test
   rake
   rspec
