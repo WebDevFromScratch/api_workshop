@@ -106,8 +106,9 @@ module V2
 
         vote.update(new_value: vote_hash['value'], value: vote_hash['value'], user_id: user.id, story_id: story.id)
 
+        story.votes_count += 1 if vote.valid? && !user.voted_on_story?(story.id)
+
         if vote.save
-          story.votes_count += 1
           story.reload
           status 200
           format_response({value: vote.value, user_id: vote.user_id, story_id: vote.story_id}, 'vote')
