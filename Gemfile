@@ -13,6 +13,7 @@ gem 'sinatra-router'
 gem 'sinatra-contrib'
 gem 'rack-cache'
 gem 'dalli'
+gem 'kaminari'
 
 group :test do
   gem 'rspec'
