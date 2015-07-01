@@ -67,6 +67,15 @@ module V2
 
         headers['Link'] = pagination_links.join(', ')
       end
+
+      def set_locale
+        locale = env.http_accept_language.preferred_language_from(I18n.available_locales)
+        I18n.locale = locale unless locale.nil?
+      end
+    end
+
+    before do
+      set_locale
     end
 
     error ActiveRecord::RecordNotFound do

@@ -3,11 +3,14 @@ require 'sinatra/router'
 require 'dalli'
 require 'rack-cache'
 require 'kaminari'
+require 'http_accept_language'
 Dir.glob('./{config,models,controllers}/*.rb').each { |file| require file }
 Dir.glob('./v*/{models,controllers}/*.rb').each { |file| require file }
 
 class App < Sinatra::Base
   Kaminari::Hooks.init
+
+  use HttpAcceptLanguage::Middleware
 
   use Sinatra::Router do
     def valid_accept_header?(accept_header)
