@@ -15,7 +15,7 @@ module V1
         else
           errors = user.errors.messages
 
-          (errors[:username] && errors[:username].include?('has already been taken')) ? status(409) : status(422)
+          (errors[:username] && errors[:username].include?(I18n.t('errors.taken'))) ? status(409) : status(422)
           format_response(errors, 'errors')
         end
       end

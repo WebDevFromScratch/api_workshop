@@ -71,7 +71,7 @@ module V2
 
     error ActiveRecord::RecordNotFound do
       status 404
-      format_response({error: 'The page you requested could not be found.'}, 'errors')
+      format_response({error: I18n.t(:error_404)}, 'errors')
     end
   end
 end

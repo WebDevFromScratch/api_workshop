@@ -50,7 +50,7 @@ module V2
         else
           errors = story.errors.messages
 
-          (errors[:url] && errors[:url].include?('has already been taken')) ? status(409) : status(422)
+          (errors[:url] && errors[:url].include?(I18n.t('errors.taken'))) ? status(409) : status(422)
           format_response(errors, 'errors')
         end
       end
@@ -137,7 +137,7 @@ module V2
           status 204
         else
           status 422
-          format_response({error: 'You have not voted yet.'}, 'errors')
+          format_response({error: I18n.t(:error_not_voted)}, 'errors')
         end
       end
 
