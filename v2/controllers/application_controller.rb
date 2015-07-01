@@ -33,7 +33,7 @@ module V2
 
       def respond_with_unauthorized
         headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-        halt 401, format_response({error: 'Not authorized'}, 'errors')
+        halt 401, format_response({error: I18n.t(:error_401)}, 'errors')
       end
 
       def parse_request_body(request_body)
